@@ -13,28 +13,32 @@ class App extends Component {
     this.state = {
       searchTerm: "",
       pokemonArray: turnObjectIntoArray(PokeObject),
-      partyArray: []
+      sideParty: []
     };
   }
 
-  addToParty = name => {
+  addToSideParty = (pokemonName) => {
     return () => {
-      const newPartyArray = this.state.partyArray.concat(name);
-      this.setState({ partyArray: newPartyArray });
-    };
-  };
+        console.log("inner function invoked with", pokemonName)
+        this.state.sideParty.push(pokemonName)
+        this.setState({ sideParty: this.state.sideParty })
+    }
+  }
 
-  removeFromParty = name => {
+  removeFromSideParty = (pokemonName) => {
     return () => {
-      const index = this.state.partyArray.indexOf(name);
-      this.state.partyArray.splice(index, 1);
-      this.setState({ partyArray: this.state.partyArray });
-    };
-  };
+      const reducedSideParty = this.state.sideParty
+      .filter(name => {
+        return name !== pokemonName;
+      })
+      this.setState({ sideParty: reducedSideParty })
+    }
+  }
 
   render() {
-    const { pokemonArray, searchTerm, partyArray } = this.state;
+    const { pokemonArray, searchTerm, sideParty } = this.state;
 
+    console.log(sideParty)
     return (
       <Page>
         <Page.Main>
@@ -58,8 +62,7 @@ class App extends Component {
               {pokemonArray
                 .filter(poke => {
                   return (
-                    poke.name.includes(searchTerm) &&
-                    !partyArray.includes(poke.name)
+                    poke.name.includes(searchTerm)
                   );
                 })
                 .map(poke => {
@@ -67,7 +70,8 @@ class App extends Component {
                     <PokeCard
                       key={poke.name}
                       pokemon={poke}
-                      iconClick={this.addToParty}
+                      clickIcon={this.addToSideParty}
+                      enabled={!this.state.sideParty.includes(poke.name)}
                     />
                   );
                 })}
@@ -75,8 +79,14 @@ class App extends Component {
           </Page.Body>
         </Page.Main>
         <Sidebar
-          pokemonNames={partyArray}
-          removeFromParty={this.removeFromParty}
+        pokemonArray={pokemonArray
+          .filter(poke => {
+            return (
+              sideParty.includes(poke.name)
+            );
+          })
+        }
+        removeFromSideParty={this.removeFromSideParty}
         />
       </Page>
     );

@@ -16,12 +16,17 @@ const Stat = ({ name, value }) => (
   </Flex>
 );
 
+const noFunction = (name) => {}
+
 // ------ PokeCard --------
 // Exported component
 // Stateless Component with explicit return
 // Assigning keys to variables
 const PokeCard = props => {
   const { name, stats, sprites } = props.pokemon;
+
+  const opacity = props.enabled ? 1.0 : 0.5
+  const clickIcon = props.enabled ? props.clickIcon : noFunction
 
   const statComponents = stats.map(stat => {
     return (
@@ -39,10 +44,11 @@ const PokeCard = props => {
             </div>
             <div>
               <Icon
-                clickable={true}
+                clickable={props.enabled}
                 size="sm"
                 icon="star"
-                onClick={props.iconClick(name)}
+                onClick={clickIcon(name)}
+                style={{ opacity: opacity }}
               />
             </div>
           </Flex>
@@ -56,10 +62,6 @@ const PokeCard = props => {
       </Card>
     </div>
   );
-};
-
-PokeCard.defaultProps = {
-  iconClick: () => {}
 };
 
 export default PokeCard;
